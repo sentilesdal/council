@@ -39,10 +39,10 @@ export async function main() {
   }
   await sleep(10_000);
 
-  const { vestingVault, timeLock } = addressesJson.addresses;
+  const { timeLock } = addressesJson.addresses;
   const timelockContract = Timelock__factory.connect(timeLock, signer);
 
-  const rawdata = fs.readFileSync("scripts/egp27/proposalInfo.json");
+  const rawdata = fs.readFileSync("scripts/egp-tbd/proposalInfo.json");
   const proposalInfo: ProposalInfo = JSON.parse(rawdata.toString());
   const { proposalId, targetsTimeLock, calldatasTimeLock } = proposalInfo;
 
@@ -53,18 +53,4 @@ export async function main() {
     console.log("proposalId", proposalId, "failed");
     console.log("err", err.reason);
   }
-
-  const granteeAddresses = grants.grantUpdatesForEGP27.map((g) => g.who);
-
-  const grantsAfterProposal = await fetchGrantsByAddress(vestingVault, signer);
-  console.log("logging all grants");
-  logGrants(grantsAfterProposal, "grantsAfterEGP27.csv");
-  // console the grants in grants.ts
-  consoleGrants(
-    Object.fromEntries(
-      Object.entries(grantsAfterProposal).filter(([address]) =>
-        granteeAddresses.includes(address)
-      )
-    )
-  );
 }

@@ -37,7 +37,7 @@ export async function main() {
   const { coreVoting } = addressesJson.addresses;
   const coreVotingContract = CoreVoting__factory.connect(coreVoting, signer);
 
-  const rawdata = fs.readFileSync("scripts/egp27/proposalInfo.json");
+  const rawdata = fs.readFileSync("scripts/egp-tbd/proposalInfo.json");
   const proposalInfo: ProposalInfo = JSON.parse(rawdata.toString());
   const { proposalId, targets, callDatas } = proposalInfo;
 

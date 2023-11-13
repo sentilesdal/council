@@ -50,7 +50,7 @@ export async function createUpgradeGrantsProposal() {
 
   console.log("creating the proposal");
 
-  const rawdata = fs.readFileSync("scripts/egp27/proposalArgs.json");
+  const rawdata = fs.readFileSync("scripts/egp-tbd/proposalArgs.json");
   const args: ProposalArgs = JSON.parse(rawdata.toString());
   const {
     targets,
@@ -110,5 +110,5 @@ export async function createUpgradeGrantsProposal() {
 
   const proposalInfo: ProposalInfo = Object.fromEntries(proposalArgs);
   const data = JSON.stringify(proposalInfo, null, 2);
-  fs.writeFileSync("scripts/egp27/proposalInfo.json", data);
+  fs.writeFileSync("scripts/egp-tbd/proposalInfo.json", data);
 }
