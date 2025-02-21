@@ -9,16 +9,15 @@ import { Timelock__factory, Treasury__factory } from "typechain";
 import { createCallHash } from "src/helpers/createCallHash";
 import { getSigner } from "scripts/helpers/getSigner";
 import { parseEther } from "ethers/lib/utils";
+import hre from "hardhat";
 
 const { PRIVATE_KEY } = process.env;
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-
-const MAX_UINT_256 =
-  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+const ZERO_ADDRESS = hre.ethers.constants.AddressZero;
+const MAX_UINT_256 = hre.ethers.constants.MaxUint256;
 
 const delvWalletAddress = "0xF6094C3A380AD6161Fb8240F3043392A0E427CAC";
-const foundationWalletAddress = "0x0000000000000000000000000000000000000000";
+const foundationWalletAddress = "0x0000000000000000000000000000000000000001";
 
 //*************************************************//
 // Returns arguments to transfer funds from the treasury to the delv wallet.
@@ -141,6 +140,8 @@ export async function getProposalArgs(
 
   // Set approvals for the hdLockingVault from the treasury for HD tokens.
   const treasuryInterface = new ethers.utils.Interface(Treasury__factory.abi);
+  console.log("hdTokenAddress", hdTokenAddress);
+  console.log("hdLockingVaultAddress", hdLockingVaultAddress);
   const callDataTreasuryApproveHdLockingVault =
     treasuryInterface.encodeFunctionData("approve", [
       hdTokenAddress,
@@ -189,27 +190,28 @@ export async function getProposalArgs(
   );
   const callDataBurnFoundationBalance = elfiTokenInterface.encodeFunctionData(
     "burn",
-    [delvWalletAddress, foundationBalance]
+    [foundationWalletAddress, foundationBalance]
   );
   const callDataBurnTreasuryBalance = elfiTokenInterface.encodeFunctionData(
     "burn",
-    [delvWalletAddress, treasuryBalance]
+    [treasuryAddress, treasuryBalance]
   );
 
   const hdTokenInterface = new ethers.utils.Interface(
     ERC20PermitWithMint__factory.abi
   );
+
   const callDataMintDelvBalance = hdTokenInterface.encodeFunctionData("mint", [
     delvWalletAddress,
-    delvBalance.mul(parseEther("10")),
+    delvBalance.mul(10),
   ]);
   const callDataMintFoundationBalance = hdTokenInterface.encodeFunctionData(
     "mint",
-    [delvWalletAddress, foundationBalance.mul(parseEther("10"))]
+    [foundationWalletAddress, foundationBalance.mul(10)]
   );
   const callDataMintTreasuryBalance = hdTokenInterface.encodeFunctionData(
     "mint",
-    [delvWalletAddress, treasuryBalance.mul(parseEther("10"))]
+    [treasuryAddress, treasuryBalance.mul(10)]
   );
 
   // Set the owner of the ELFI token to the zero address to revoke mint privileges.
@@ -235,11 +237,11 @@ export async function getProposalArgs(
     callDataTreasuryApproveHdMigrationRewardsVault,
     callDataTreasuryApproveHdMigrationLinearVestingVault,
     callDataTreasuryApproveHdGscVault,
-    // burn ELFI balances for Delv, Foundation, Treasury
+    // // burn ELFI balances for Delv, Foundation, Treasury
     callDataBurnDelvBalance,
     callDataBurnFoundationBalance,
     callDataBurnTreasuryBalance,
-    // mint 10x HD balances for Delv, Foundation, Treasury
+    // // mint 10x HD balances for Delv, Foundation, Treasury
     callDataMintDelvBalance,
     callDataMintFoundationBalance,
     callDataMintTreasuryBalance,
@@ -263,11 +265,11 @@ export async function getProposalArgs(
     treasuryAddress,
     treasuryAddress,
     treasuryAddress,
-    // burn balances for Delv, Foundation, Treasury
+    // // burn balances for Delv, Foundation, Treasury
     tokenAddress,
     tokenAddress,
     tokenAddress,
-    // mint 10x balances for Delv, Foundation, Treasury
+    // // mint 10x balances for Delv, Foundation, Treasury
     hdTokenAddress,
     hdTokenAddress,
     hdTokenAddress,
